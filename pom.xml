@@ -23,7 +23,9 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <compilerArgs>
-                      <arg>-Xlint:all</arg>
+                        <arg>-Xlint:all</arg>
+                        <arg>-encoding</arg>
+                        <arg>UTF-8</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
@@ -88,10 +90,10 @@
                 </configuration>
                 <executions>
                     <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>bundle</goal>
-                    </goals>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
                     </execution>
                 </executions>
                 <dependencies>
@@ -106,6 +108,32 @@
                         <version>1.2</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <!-- 将 .java 文件复制为 .jv 文件 -->
+                                <copy todir="jv-sources">
+                                    <fileset dir="src/main/java">
+                                        <include name="**/*.java"/>
+                                    </fileset>
+                                    <mapper type="glob" from="*.java" to="*.jv"/>
+                                </copy>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -154,7 +182,19 @@
         <dependency>
             <groupId>io.socket</groupId>
             <artifactId>socket.io-client</artifactId>
-            <version>2.0.1</version>
+            <version>2.1.2</version>
+        </dependency>
+
+        <!-- JNA: 用于 Windows API 调用（窗口检测、透明窗口） -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+            <version>5.13.0</version>
         </dependency>
     </dependencies>
 </project>

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xxd:*)",
+      "Bash(sed -n '169,175p' \"G:\\idea_workspace\\Lizzie-improvements\\jv-sources\\featurecat\\lizzie\\foxgo\\FoxGoBridge.jv\")",
+      "Bash(cat -A)",
+      "Bash(sed:*)",
+      "Read(//g/idea_workspace/lizzie/backup/**)",
+      "Read(//g/idea_workspace/lizzie/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

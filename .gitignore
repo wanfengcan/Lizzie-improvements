@@ -15,3 +15,7 @@ target
 leelaz_opencl_tuning
 *.sh
 *.jar
+/.workbuddy/
+/.settings/
+/gtp_logs/
+/nul
