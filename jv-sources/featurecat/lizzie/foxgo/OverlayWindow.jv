@@ -185,11 +185,11 @@ public class OverlayWindow extends JWindow {
     // 如果有偏移记忆，应用偏移
     if (windowOffsetX != 0 || windowOffsetY != 0) {
       setLocation(
-          topLeftX - PADDING + windowOffsetX, topLeftY - PADDING + windowOffsetY);
+          topLeftX - PADDING + windowOffsetX, topLeftY - PADDING + windowOffsetY + windowOffsetY);
     } else {
       setLocation(topLeftX - PADDING, topLeftY - PADDING);
     }
-    setSize(overlayWidth, overlayHeight);
+    setSize(overlayWidth, overlayHeight + titleBar.getPreferredSize().height);
   }
 
   /** 更新 AI 分析结果 */

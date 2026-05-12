@@ -31,7 +31,6 @@ public class FoxGoBridge {
   private boolean autoDetectWindow = true;
   private List<MovePosition> lastKnownStones = new ArrayList<>();
   private int lastBoardHash = 0;
-  private Robot robot;
 
   public interface FoxGoListener {
     void onStatusChanged(String status);
@@ -78,13 +77,6 @@ public class FoxGoBridge {
     lastKnownStones.clear();
     lastBoardHash = 0;
 
-    try {
-      robot = new Robot();
-    } catch (AWTException e) {
-      System.err.println("[FoxGoBridge] Failed to create Robot: " + e.getMessage());
-      return;
-    }
-
     overlayWindow.alignToBoard(
         stoneDetector.getX0(),
         stoneDetector.getY0(),
@@ -130,8 +122,8 @@ public class FoxGoBridge {
   private void pollCycle() {
     try {
       if (autoDetectWindow && !detector.isFoxGoActive()) return;
-      if (robot == null) return;
 
+      Robot robot = new Robot();
       Rectangle boardRect =
           new Rectangle(
               stoneDetector.getX0() - 10,
@@ -176,6 +168,7 @@ public class FoxGoBridge {
         () -> {
           if (!removedStones.isEmpty()) {
             // Rebuild full board state
+            Lizzie.board.clear();
             Lizzie.board.clear();
             for (MovePosition mp : current) {
               Lizzie.board.place(mp.getCol(), mp.getRow(), mp.getStone());
