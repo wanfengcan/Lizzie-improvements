@@ -1,54 +1,1 @@
-package featurecat.lizzie.foxgo;
-
-import featurecat.lizzie.rules.Stone;
-
-/** Value object representing a stone position on the Fox Go board. */
-public class MovePosition {
-  private final int row; // 0-18
-  private final int col; // 0-18
-  private final Stone stone;
-
-  public MovePosition(int row, int col, Stone stone) {
-    this.row = row;
-    this.col = col;
-    this.stone = stone;
-  }
-
-  public int getRow() {
-    return row;
-  }
-
-  public int getCol() {
-    return col;
-  }
-
-  public Stone getStone() {
-    return stone;
-  }
-
-  /** Convert to GTP coordinate name, e.g. "D4", "Q16" */
-  public String toCoordName() {
-    char colChar = (char) ('A' + col);
-    if (colChar >= 'I') colChar++;
-    return String.valueOf(colChar) + (19 - row);
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof MovePosition)) return false;
-    MovePosition that = (MovePosition) o;
-    return row == that.row && col == that.col && stone == that.stone;
-  }
-
-  @Override
-  public int hashCode() {
-    return 31 * (31 * row + col) + stone.hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return String.format(
-        "MovePosition{row=%d, col=%d, stone=%s, coord=%s}", row, col, stone, toCoordName());
-  }
-}
+package featurecat.lizzie.foxgo;import featurecat.lizzie.rules.Stone;/** Value object representing a stone position on the Fox Go board. */public class MovePosition {  private final int row; // 0-18  private final int col; // 0-18  private final Stone stone;  public MovePosition(int row, int col, Stone stone) {    this.row = row;    this.col = col;    this.stone = stone;  }  public int getRow() {    return row;  }  public int getCol() {    return col;  }  public Stone getStone() {    return stone;  }  /** Convert to GTP coordinate name, e.g. "D4", "Q16" */  public String toCoordName() {    char colChar = (char) ('A' + col);    if (colChar >= 'I') colChar++;    return String.valueOf(colChar) + (19 - row);  }  @Override  public boolean equals(Object o) {    if (this == o) return true;    if (!(o instanceof MovePosition)) return false;    MovePosition that = (MovePosition) o;    return row == that.row && col == that.col && stone == that.stone;  }  @Override  public int hashCode() {    return 31 * (31 * row + col) + stone.hashCode();  }  @Override  public String toString() {    return String.format(        "MovePosition{row=%d, col=%d, stone=%s, coord=%s}", row, col, stone, toCoordName());  }}
