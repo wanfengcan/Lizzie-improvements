@@ -4,7 +4,6 @@ import featurecat.lizzie.analysis.EngineManager;
 import featurecat.lizzie.analysis.Leelaz;
 import featurecat.lizzie.gui.GtpConsolePane;
 import featurecat.lizzie.gui.LizzieFrame;
-import featurecat.lizzie.gui.LizzieMain;
 import featurecat.lizzie.gui.MainFrame;
 import featurecat.lizzie.rules.Board;
 import featurecat.lizzie.util.Utils;
@@ -40,7 +39,7 @@ public class Lizzie {
   }
 
   private static void mainInEDT() {
-    frame = config.panelUI ? new LizzieMain() : new LizzieFrame();
+    frame = new LizzieFrame();
     gtpConsole = new GtpConsolePane(frame);
     gtpConsole.setVisible(config.persistedUi.optBoolean("gtp-console-opened", false));
     initializeEngineManager();
@@ -50,8 +49,7 @@ public class Lizzie {
     try {
       engineManager = new EngineManager(config);
     } catch (IOException e) {
-      frame.openConfigDialog();
-      Utils.showMessageDialog(frame, "Please restart Lizzie to apply changes.");
+      Utils.showMessageDialog(frame, "Engine initialization failed: " + e.getMessage());
       System.exit(1);
     }
 

@@ -1,0 +1,90 @@
+classDiagram
+    class HtmlKit {
+        -StyleSheet style
+        +setStyleSheet(StyleSheet)
+        +getStyleSheet() StyleSheet
+    }
+    HTMLEditorKit <|-- HtmlKit
+
+    class MainFrame {
+        <<abstract>>
+        +ResourceBundle resourceBundle$
+        +boolean isPlayingAgainstLeelaz
+        +boolean playerIsBlack
+        +boolean isNewGame
+        +int boardPositionProportion
+        +boolean showControls
+        +Font uiFont$
+        +Font winrateFont$
+        +ToolBar toolBar
+        +void repaint()
+        +void refresh()
+        +void startGame()
+        +void editGameInfo()
+        +void saveFile()
+        +void openFile()
+        +void loadFile(File)
+        +void toggleGtpConsole()
+        +void toggleToolBar()
+    }
+
+    class LizzieFrame {
+        -BoardRenderer boardRenderer
+        -BoardRenderer subBoardRenderer
+        -Menu menu
+        -JPanel mainPanel
+        -int[] mouseOverCoordinate
+        +paintMainPanel(Graphics)
+        +void clear()
+        +void onClicked(int, int)
+        +void onDoubleClicked(int, int)
+        +void onMouseMoved(int, int)
+        +void onMouseDragged(int, int)
+        +boolean subBoardOnClick(MouseEvent)
+        +void startRawBoard()
+        +void stopRawBoard()
+    }
+    MainFrame <|-- LizzieFrame
+
+    class GtpConsolePane {
+        -HTMLDocument htmlDoc
+        -HtmlKit htmlKit
+        -StyleSheet htmlStyle
+        -JScrollPane scrollPane
+        -JTextPane console
+        +addCommand(String, int)
+        +addLine(String)
+        +formatCommand(String, int) String
+        +format(String) String
+    }
+    LizzieDialog <|-- GtpConsolePane
+
+    class Config {
+        +boolean showWinrate
+        +boolean showVariationGraph
+        +boolean showComment
+        +boolean showCaptured
+        +boolean showStatus
+        +boolean showSubBoard
+        +boolean showBranch
+        +boolean showBestMoves
+        +boolean showNextMoves
+        +int boardPositionProportion
+        +JSONObject config
+        +void save()
+        +void persist()
+        +void toggleShowSubBoard()
+        +void toggleShowWinrate()
+        +String gtpConsoleStyle
+    }
+
+    class Lizzie {
+        +Config config$
+        +MainFrame frame$
+        +GtpConsolePane gtpConsole$
+        +Board board$
+        +Leelaz leelaz$
+        +EngineManager engineManager$
+        +void main(String[])
+        +void shutdown()
+    }

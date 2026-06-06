@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Lizzie
+    participant Config
+    participant LizzieFrame
+    participant GtpConsolePane
+    participant EngineManager
+
+    Lizzie->>Lizzie: main(args)
+    Lizzie->>Lizzie: setLookAndFeel()
+    Lizzie->>Config: new Config()
+    Config-->>Lizzie: config
+    Lizzie->>LizzieFrame: new LizzieFrame()
+    LizzieFrame->>LizzieFrame: init boardRenderer, subBoardRenderer
+    LizzieFrame->>LizzieFrame: init Menu, ToolBar
+    LizzieFrame->>LizzieFrame: setVisible(true)
+    Lizzie->>GtpConsolePane: new GtpConsolePane(frame)
+    Lizzie->>EngineManager: new EngineManager(config)

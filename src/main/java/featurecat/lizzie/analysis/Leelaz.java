@@ -468,12 +468,6 @@ public class Leelaz {
         } else if (isThinking && !isPondering) {
           if (Lizzie.frame.isPlayingAgainstLeelaz || isInputCommand) {
             Lizzie.board.place(params[1]);
-            if (Lizzie.frame.isAutoEstimating) {
-              if (Lizzie.board.getHistory().isBlacksTurn())
-                Lizzie.frame.zen.sendCommand("play " + "w " + params[1]);
-              else Lizzie.frame.zen.sendCommand("play " + "b " + params[1]);
-              Lizzie.frame.zen.countStones();
-            }
             // TODO Do not ponder when playing against Leela Zero
             //            togglePonder();
             if (!isInputCommand) {
@@ -558,12 +552,6 @@ public class Leelaz {
       }
       cmdQueue.addLast(command);
       trySendCommandFromQueue();
-      if (Lizzie.frame.isAutoEstimating) {
-        if (command.startsWith("play") || command.startsWith("undo")) {
-          Lizzie.frame.zen.sendCommand(command);
-          Lizzie.frame.zen.countStones();
-        }
-      }
     }
   }
 
@@ -1066,8 +1054,7 @@ public class Leelaz {
     if (engineCommand.isEmpty()) {
       // we can use Lizzie even without an engine, if the config defaults to ""
       if (!isLoaded) {
-        if (Lizzie.config.panelUI) Lizzie.frame.refresh(1);
-        else Lizzie.frame.refresh();
+        Lizzie.frame.refresh();
         isLoaded = true;
       }
     }

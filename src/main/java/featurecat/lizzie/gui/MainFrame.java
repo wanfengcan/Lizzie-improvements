@@ -3,20 +3,12 @@ package featurecat.lizzie.gui;
 import featurecat.lizzie.Lizzie;
 import featurecat.lizzie.analysis.GameInfo;
 import featurecat.lizzie.analysis.Leelaz;
-import featurecat.lizzie.analysis.YaZenGtp;
-import featurecat.lizzie.rules.GIBParser;
 import featurecat.lizzie.rules.SGFParser;
 import featurecat.lizzie.util.Utils;
-import java.awt.BorderLayout;
 import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.HeadlessException;
-import java.awt.LayoutManager;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.File;
@@ -28,8 +20,6 @@ import java.util.ResourceBundle;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -48,8 +38,6 @@ public abstract class MainFrame extends JFrame {
   public boolean showControls = false;
   public static Font uiFont;
   public static Font winrateFont;
-  public YaZenGtp zen;
-  public static CountResults countResults;
   public boolean isEstimating = false;
   public boolean isFirstCount = true;
   public boolean isAutoEstimating = false;
@@ -61,11 +49,6 @@ public abstract class MainFrame extends JFrame {
     // load fonts
     try {
       uiFont = new Font("SansSerif", Font.TRUETYPE_FONT, 12);
-      //          Font.createFont(
-      //              Font.TRUETYPE_FONT,
-      //              Thread.currentThread()
-      //                  .getContextClassLoader()
-      //                  .getResourceAsStream("fonts/OpenSans-Regular.ttf"));
       winrateFont =
           Font.createFont(
               Font.TRUETYPE_FONT,
@@ -83,7 +66,6 @@ public abstract class MainFrame extends JFrame {
   // Force refresh board
   private boolean forceRefresh;
   public boolean isMouseOver = false;
-  public OnlineDialog onlineDialog = null;
 
   public MainFrame() throws HeadlessException {
     super(DEFAULT_TITLE);
@@ -120,11 +102,6 @@ public abstract class MainFrame extends JFrame {
     repaint();
   }
 
-  /**
-   * Refresh
-   *
-   * @param type: 0-All, 1-Only Board, 2-Invalid Layout
-   */
   public void refresh(int type) {
     repaint();
   }
@@ -150,7 +127,7 @@ public abstract class MainFrame extends JFrame {
         });
   }
 
-  protected abstract void removeEstimateRectInEDT();
+  public void removeEstimateRectInEDT() {}
 
   public void drawEstimateRectKata(ArrayList<Double> estimateArray) {
     SwingUtilities.invokeLater(
@@ -161,23 +138,25 @@ public abstract class MainFrame extends JFrame {
         });
   }
 
-  protected abstract void drawEstimateRectKataInEDT(ArrayList<Double> estimateArray);
+  public void drawEstimateRectKataInEDT(ArrayList<Double> estimateArray) {}
 
-  public abstract void drawControls();
+  public void drawControls() {}
 
-  public abstract void replayBranch(boolean generateGif);
+  public void replayBranch(boolean generateGif) {}
 
-  public abstract void refreshBackground();
+  public void refreshBackground() {}
 
-  public abstract void resetImages();
+  public void resetImages() {}
 
-  public abstract void clear();
+  public void clear() {}
 
-  public abstract boolean isMouseOver(int x, int y);
+  public boolean isMouseOver(int x, int y) {
+    return false;
+  }
 
-  public abstract void onClicked(int x, int y);
+  public void onClicked(int x, int y) {}
 
-  public abstract void onDoubleClicked(int x, int y);
+  public void onDoubleClicked(int x, int y) {}
 
   public void checkRightClick(MouseEvent e) {
     if (e.getButton() == MouseEvent.BUTTON3) {
@@ -193,65 +172,39 @@ public abstract class MainFrame extends JFrame {
     Input.undo();
   }
 
-  public abstract boolean subBoardOnClick(MouseEvent e);
+  public boolean subBoardOnClick(MouseEvent e) {
+    return false;
+  }
 
-  public abstract void onCenterClicked(int x, int y);
+  public void onCenterClicked(int x, int y) {}
 
-  public abstract void onMouseDragged(int x, int y);
+  public void onMouseDragged(int x, int y) {}
 
   public void onMouseExited(int x, int y) {}
 
-  public abstract void onMouseMoved(int x, int y);
+  public void onMouseMoved(int x, int y) {}
 
-  public abstract void startRawBoard();
+  public void startRawBoard() {}
 
-  public abstract void stopRawBoard();
+  public void stopRawBoard() {}
 
-  public abstract boolean incrementDisplayedBranchLength(int n);
+  public boolean incrementDisplayedBranchLength(int n) {
+    return false;
+  }
 
   public void doBranch(int moveTo) {}
 
   public void addSuggestionAsBranch() {}
 
-  public abstract void increaseMaxAlpha(int k);
+  public void increaseMaxAlpha(int k) {}
 
   public abstract void copySgf();
 
   public abstract void pasteSgf();
 
-  public void editComment() {
-    String oldComment = Lizzie.board.getHistory().getData().comment;
-    // https://stackoverflow.com/questions/7765478/how-to-add-text-area-on-joptionpane
-    // https://stackoverflow.com/a/55678093
-    JTextArea textArea = new JTextArea(oldComment);
-    textArea.setColumns(40);
-    textArea.setRows(20);
-    textArea.setLineWrap(true);
-    textArea.setWrapStyleWord(true);
-    textArea.setSize(textArea.getPreferredSize().width, textArea.getPreferredSize().height);
-    int ret =
-        JOptionPane.showConfirmDialog(
-            this,
-            new JScrollPane(textArea),
-            resourceBundle.getString("LizzieConfig.title.comment"),
-            JOptionPane.OK_CANCEL_OPTION);
-    if (ret == JOptionPane.OK_OPTION) {
-      Lizzie.board.getHistory().getData().comment = textArea.getText();
-      refresh();
-    }
-  }
+  public void editComment() {}
 
-  public void copyCommentToClipboard() {
-    String comment = Lizzie.board.getHistory().getData().comment;
-    if (comment.isEmpty()) return;
-    try {
-      Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      Transferable transferableString = new StringSelection(comment);
-      clipboard.setContents(transferableString, null);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
+  public void copyCommentToClipboard() {}
 
   public void setPlayers(String whitePlayer, String blackPlayer) {
     playerTitle = String.format("(%s [W] vs %s [B])", whitePlayer, blackPlayer);
@@ -281,22 +234,11 @@ public abstract class MainFrame extends JFrame {
     updateTitle();
   }
 
-  public void openConfigDialog() {
-    ConfigDialog configDialog = new ConfigDialog();
-    configDialog.setVisible(true);
-    //    configDialog.dispose();
-  }
+  public void openConfigDialog() {}
 
-  public void openConfigDialog(int index) {
-    ConfigDialog configDialog = new ConfigDialog();
-    configDialog.switchTab(index);
-    configDialog.setVisible(true);
-  }
+  public void openConfigDialog(int index) {}
 
-  public void openChangeMoveDialog() {
-    ChangeMoveDialog changeMoveDialog = new ChangeMoveDialog();
-    changeMoveDialog.setVisible(true);
-  }
+  public void openChangeMoveDialog() {}
 
   public void openAvoidMoveDialog() {
     AvoidMoveDialog avoidMoveDialog = new AvoidMoveDialog();
@@ -324,12 +266,6 @@ public abstract class MainFrame extends JFrame {
   }
 
   public String getToolBarPosition() {
-    LayoutManager layout = getContentPane().getLayout();
-    if (layout instanceof LizzieLayout) {
-      Lizzie.config.toolbarPosition = (String) ((LizzieLayout) layout).getConstraints(toolBar);
-    } else if (layout instanceof BorderLayout) {
-      Lizzie.config.toolbarPosition = (String) ((BorderLayout) layout).getConstraints(toolBar);
-    }
     return Lizzie.config.toolbarPosition;
   }
 
@@ -337,12 +273,7 @@ public abstract class MainFrame extends JFrame {
     return requestFocusInWindow();
   }
 
-  public void openOnlineDialog() {
-    if (onlineDialog == null) {
-      onlineDialog = new OnlineDialog();
-    }
-    onlineDialog.setVisible(true);
-  }
+  public void openOnlineDialog() {}
 
   public void startGame() {
     GameInfo gameInfo = Lizzie.board.getHistory().getGameInfo();
@@ -352,7 +283,6 @@ public abstract class MainFrame extends JFrame {
     gameDialog.setVisible(true);
     boolean playerIsBlack = gameDialog.playerIsBlack();
     boolean isNewGame = gameDialog.isNewGame();
-    //    gameDialog.dispose();
     if (gameDialog.isCancelled()) return;
 
     if (isNewGame) {
@@ -439,7 +369,7 @@ public abstract class MainFrame extends JFrame {
     FileDialog fileDialog = new FileDialog(this, resourceBundle.getString("LizzieFrame.openFile"));
     fileDialog.setLocationRelativeTo(this);
     fileDialog.setDirectory(filesystem.getString("last-folder"));
-    fileDialog.setFile("*.sgf;*.gib;*.SGF;*.GIB");
+    fileDialog.setFile("*.sgf;*.SGF");
     fileDialog.setMultipleMode(false);
     fileDialog.setMode(0);
     fileDialog.setVisible(true);
@@ -449,19 +379,12 @@ public abstract class MainFrame extends JFrame {
 
   public void loadFile(File file) {
     JSONObject filesystem = Lizzie.config.persisted.getJSONObject("filesystem");
-    if (!(file.getPath().endsWith(".sgf")
-        || file.getPath().endsWith(".gib")
-        || file.getPath().endsWith(".SGF")
-        || file.getPath().endsWith(".GIB"))) {
+    if (!(file.getPath().endsWith(".sgf") || file.getPath().endsWith(".SGF"))) {
       file = new File(file.getPath() + ".sgf");
     }
     try {
       System.out.println(file.getPath());
-      if (file.getPath().endsWith(".sgf") || file.getPath().endsWith(".SGF")) {
-        SGFParser.load(file.getPath());
-      } else {
-        GIBParser.load(file.getPath());
-      }
+      SGFParser.load(file.getPath());
       if (file.getParent() != null) {
         filesystem.put("last-folder", file.getParent());
       }
@@ -480,49 +403,27 @@ public abstract class MainFrame extends JFrame {
         : resourceBundle.getString("LizzieFrame.display.loading");
   }
 
-  public void toggleEstimateByZen() {
-    if (isEstimating) {
-      noEstimateByZen(true);
-    } else {
-      estimateByZen();
-    }
+  public void toggleEstimateByZen() {}
+
+  public boolean playCurrentVariation() {
+    return false;
   }
 
-  public abstract boolean playCurrentVariation();
+  public void playBestMove() {}
 
-  public abstract void playBestMove();
+  public void estimateByZen() {}
 
-  public abstract void estimateByZen();
+  public void noAutoEstimateByZen() {}
 
-  public abstract void noAutoEstimateByZen();
+  public void noEstimateByZen(boolean byToolBar) {}
 
-  public abstract void noEstimateByZen(boolean byToolBar);
+  public void drawEstimateRectZen(ArrayList<Double> estimateArray) {}
 
-  public abstract void drawEstimateRectZen(ArrayList<Double> estimateArray);
+  public void saveImage() {}
 
-  public void saveImage() {};
+  public void updateEngineMenu(List<Leelaz> engineList) {}
 
-  public void updateEngineMenu(List<Leelaz> engineList) {
-    SwingUtilities.invokeLater(
-        new Runnable() {
-          public void run() {
-            updateEngineMenuInEDT(engineList);
-          }
-        });
-  }
-
-  protected abstract void updateEngineMenuInEDT(List<Leelaz> engineList);
-
-  public void updateEngineIcon(List<Leelaz> engineList, int currentEngineNo) {
-    SwingUtilities.invokeLater(
-        new Runnable() {
-          public void run() {
-            updateEngineIconInEDT(engineList, currentEngineNo);
-          }
-        });
-  }
-
-  protected abstract void updateEngineIconInEDT(List<Leelaz> engineList, int currentEngineNo);
+  public void updateEngineIcon(List<Leelaz> engineList, int currentEngineNo) {}
 
   public abstract Optional<int[]> convertScreenToCoordinates(int x, int y);
 

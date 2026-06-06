@@ -67,16 +67,6 @@ public class Menu extends JMenuBar {
         });
     fileMenu.add(save);
 
-    final JMenuItem openUrl = new JMenuItem(resourceBundle.getString("Menu.file.openUrl"));
-    openUrl.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.openOnlineDialog();
-          }
-        });
-    fileMenu.add(openUrl);
-
     fileMenu.addSeparator();
     final JMenuItem copy = new JMenuItem(resourceBundle.getString("Menu.file.copy"));
     copy.addActionListener(
@@ -1425,49 +1415,6 @@ public class Menu extends JMenuBar {
     final JMenu configMenu = new JMenu(resourceBundle.getString("Menu.configMenu"));
     this.add(configMenu);
 
-    final JMenuItem engineConfig =
-        new JMenuItem(resourceBundle.getString("Menu.configMenu.engineConfig"));
-    engineConfig.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.openConfigDialog(0);
-          }
-        });
-    configMenu.add(engineConfig);
-
-    final JMenuItem viewConfig =
-        new JMenuItem(resourceBundle.getString("Menu.configMenu.viewConfig"));
-    viewConfig.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.openConfigDialog(1);
-          }
-        });
-    configMenu.add(viewConfig);
-
-    final JMenuItem themeConfig =
-        new JMenuItem(resourceBundle.getString("Menu.configMenu.themeConfig"));
-    themeConfig.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.openConfigDialog(2);
-          }
-        });
-    configMenu.add(themeConfig);
-
-    final JMenuItem about = new JMenuItem(resourceBundle.getString("Menu.configMenu.about"));
-    about.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Lizzie.frame.openConfigDialog(3);
-          }
-        });
-    configMenu.add(about);
-
     final JCheckBoxMenuItem playSound =
         new JCheckBoxMenuItem(resourceBundle.getString("Menu.configMenu.playSound"));
     playSound.addActionListener(
@@ -1562,6 +1509,18 @@ public class Menu extends JMenuBar {
             });
       }
     }
+    engineMenu.addSeparator();
+    JMenuItem engineConfigItem = new JMenuItem("\u5F15\u64CE\u914D\u7F6E...");
+    engineConfigItem.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            EngineConfigDialog d = new EngineConfigDialog(Lizzie.frame);
+            d.setLocationRelativeTo(Lizzie.frame);
+            d.setVisible(true);
+          }
+        });
+    engineMenu.add(engineConfigItem);
   }
 
   public void updateEngineIcon(List<Leelaz> engineList, int currentEngineNo) {

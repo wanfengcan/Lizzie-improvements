@@ -1,8 +1,8 @@
 package featurecat.lizzie;
 
 import featurecat.lizzie.theme.Theme;
-import featurecat.lizzie.util.WindowPosition;
 import java.awt.Color;
+import javax.swing.JFrame;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,7 +25,6 @@ import org.json.JSONTokener;
 public class Config {
   public String language = "en";
 
-  public boolean panelUI = true;
   public boolean showBorder = false;
   public boolean showMoveNumber = false;
   public int onlyLastMoveNumber = 0;
@@ -237,7 +236,6 @@ public class Config {
 
     applyTheme();
 
-    panelUI = uiConfig.optBoolean("panel-ui", false);
     showBorder = uiConfig.optBoolean("show-border", false);
     showMoveNumber = uiConfig.getBoolean("show-move-number");
     onlyLastMoveNumber = uiConfig.optInt("only-last-move-number");
@@ -618,7 +616,6 @@ public class Config {
     ui.put("append-winrate-to-comment", false);
     ui.put("replay-branch-interval-seconds", 1.0);
     ui.put("gtp-console-style", defaultGtpConsoleStyle);
-    ui.put("panel-ui", false);
     ui.put("show-katago-boardscoremean", false);
     ui.put("katago-scoremean-alwaysblack", false);
     ui.put("show-katago-estimate", false);
@@ -653,7 +650,15 @@ public class Config {
     // ui.put("max-alpha", 240);
 
     // Window Position & Size
-    ui = WindowPosition.create(ui);
+    // Window Position & Size - inline from WindowPosition.create()
+    if (ui == null) {
+      ui = new JSONObject();
+    }
+    ui.put("main-window-position", new JSONArray("[]"));
+    ui.put("gtp-console-position", new JSONArray("[]"));
+    ui.put("window-maximized", false);
+    ui.put("toolbar-position", "South");
+    ui.put("gtp-console-opened", false);
 
     config.put("filesystem", filesys);
 
@@ -679,7 +684,30 @@ public class Config {
   public void persist() throws IOException {
 
     // Save the window position
-    persistedUi = WindowPosition.save(persistedUi);
+    // Save the window position - inline from WindowPosition.save()
+    if (persistedUi == null) {
+      persistedUi = new JSONObject();
+    }
+    boolean windowIsMaximized = Lizzie.frame.getExtendedState() == JFrame.MAXIMIZED_BOTH;
+    persistedUi.put("window-maximized", windowIsMaximized);
+    persistedUi.put("toolbar-position", Lizzie.config.toolbarPosition);
+    persistedUi.put("gtp-console-opened", Lizzie.gtpConsole.isVisible());
+
+    JSONArray mainPos = new JSONArray();
+    if (!windowIsMaximized) {
+      mainPos.put(Lizzie.frame.getX());
+      mainPos.put(Lizzie.frame.getY());
+      mainPos.put(Lizzie.frame.getWidth());
+      mainPos.put(Lizzie.frame.getHeight());
+    }
+    persistedUi.put("main-window-position", mainPos);
+
+    JSONArray gtpPos = new JSONArray();
+    gtpPos.put(Lizzie.gtpConsole.getX());
+    gtpPos.put(Lizzie.gtpConsole.getY());
+    gtpPos.put(Lizzie.gtpConsole.getWidth());
+    gtpPos.put(Lizzie.gtpConsole.getHeight());
+    persistedUi.put("gtp-console-position", gtpPos);
 
     writeConfig(this.persisted, new File(persistFilename));
   }
