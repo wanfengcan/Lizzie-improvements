@@ -290,12 +290,13 @@ public class Leelaz {
     String[] variations = line.split(" info ");
     for (String var : variations) {
       if (!var.trim().isEmpty()) {
-        if (Lizzie.config.limitBestMoveNum > 0
-            && bestMoves.size() >= Lizzie.config.limitBestMoveNum) {
-          break;
-        }
         bestMoves.add(MoveData.fromInfo(var));
       }
+    }
+    bestMoves.sort((a, b) -> Double.compare(b.winrate, a.winrate));
+    if (Lizzie.config.limitBestMoveNum > 0
+        && bestMoves.size() > Lizzie.config.limitBestMoveNum) {
+      bestMoves = new ArrayList<>(bestMoves.subList(0, Lizzie.config.limitBestMoveNum));
     }
     Lizzie.board.getData().tryToSetBestMoves(bestMoves);
     return bestMoves;
@@ -306,12 +307,13 @@ public class Leelaz {
     String[] variations = line.split(" info ");
     for (String var : variations) {
       if (!var.trim().isEmpty()) {
-        if (Lizzie.config.limitBestMoveNum > 0
-            && bestMoves.size() >= Lizzie.config.limitBestMoveNum) {
-          break;
-        }
         bestMoves.add(MoveData.fromInfoKatago(var));
       }
+    }
+    bestMoves.sort((a, b) -> Double.compare(b.winrate, a.winrate));
+    if (Lizzie.config.limitBestMoveNum > 0
+        && bestMoves.size() > Lizzie.config.limitBestMoveNum) {
+      bestMoves = new ArrayList<>(bestMoves.subList(0, Lizzie.config.limitBestMoveNum));
     }
     Lizzie.board.getData().tryToSetBestMoves(bestMoves);
     return bestMoves;

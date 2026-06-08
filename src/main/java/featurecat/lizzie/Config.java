@@ -52,7 +52,6 @@ public class Config {
   public boolean showKataGoBoardScoreMean = false;
   public boolean kataGoScoreMeanAlwaysBlack = false;
   public boolean showKataGoEstimate = false;
-  public boolean showKataGoEstimateOnSubboard = true;
   public boolean showKataGoEstimateOnMainboard = true;
   public String kataGoEstimateMode = "small+dead";
   public boolean kataGoEstimateBlend = true;
@@ -63,8 +62,6 @@ public class Config {
   public boolean showBranch = true;
   public boolean showBestMoves = true;
   public boolean showNextMoves = true;
-  public boolean showSubBoard = true;
-  public boolean largeSubBoard = false;
   public boolean startMaximized = true;
   public boolean showWinrateInSuggestion = true;
   public boolean showPlayoutsInSuggestion = true;
@@ -253,8 +250,6 @@ public class Config {
     showCaptured = uiConfig.getBoolean("show-captured");
     showBestMoves = uiConfig.getBoolean("show-best-moves");
     showNextMoves = uiConfig.getBoolean("show-next-moves");
-    showSubBoard = uiConfig.getBoolean("show-subboard");
-    largeSubBoard = uiConfig.getBoolean("large-subboard");
     handicapInsteadOfWinrate = uiConfig.getBoolean("handicap-instead-of-winrate");
     showDynamicKomi = uiConfig.getBoolean("show-dynamic-komi");
     appendWinrateToComment = uiConfig.optBoolean("append-winrate-to-comment");
@@ -265,7 +260,7 @@ public class Config {
     replayBranchIntervalSeconds = uiConfig.optDouble("replay-branch-interval-seconds", 1.0);
     colorByWinrateInsteadOfVisits = uiConfig.optBoolean("color-by-winrate-instead-of-visits");
     boardPositionProportion = uiConfig.optInt("board-position-proportion", 4);
-    limitBestMoveNum = uiConfig.optInt("limit-best-move-num", 0);
+    limitBestMoveNum = uiConfig.optInt("limit-best-move-num", 50);
     limitBranchLength = uiConfig.optInt("limit-branch-length", 0);
     minPlayoutRatioForStats = uiConfig.optDouble("min-playout-ratio-for-stats", 0.1);
 
@@ -274,7 +269,6 @@ public class Config {
     showKataGoBoardScoreMean = uiConfig.optBoolean("show-katago-boardscoremean", false);
     kataGoScoreMeanAlwaysBlack = uiConfig.optBoolean("katago-scoremean-alwaysblack", false);
     showKataGoEstimate = uiConfig.optBoolean("show-katago-estimate", false);
-    showKataGoEstimateOnSubboard = uiConfig.optBoolean("show-katago-estimate-onsubboard", true);
     showKataGoEstimateOnMainboard = uiConfig.optBoolean("show-katago-estimate-onmainboard", true);
     kataGoEstimateMode = uiConfig.optString("katago-estimate-mode", "small+dead");
     kataGoEstimateBlend = uiConfig.optBoolean("katago-estimate-blend", true);
@@ -373,7 +367,6 @@ public class Config {
   }
 
   public void toggleLargeWinrate() {
-    this.largeSubBoard = setUIConfigBoolean("large-subboard", false);
     this.largeWinrate = toggleUIConfig("large-winrate");
   }
 
@@ -405,21 +398,12 @@ public class Config {
     this.handicapInsteadOfWinrate = !this.handicapInsteadOfWinrate;
   }
 
-  public void toggleLargeSubBoard() {
-    this.largeWinrate = setUIConfigBoolean("large-winrate", false);
-    this.largeSubBoard = toggleUIConfig("large-subboard");
-  }
-
   public void toggleCoordinates() {
     showCoordinates = !showCoordinates;
   }
 
   public void toggleEvaluationColoring() {
     colorByWinrateInsteadOfVisits = !colorByWinrateInsteadOfVisits;
-  }
-
-  public void toggleShowSubBoard() {
-    showSubBoard = toggleUIConfig("show-subboard");
   }
 
   public void toggleShowPolicy() {
@@ -487,10 +471,6 @@ public class Config {
   private boolean setUIConfigBoolean(String key, boolean value) {
     uiConfig.put(key, value);
     return value;
-  }
-
-  public boolean showLargeSubBoard() {
-    return showSubBoard && largeSubBoard;
   }
 
   public boolean showLargeWinrate() {
@@ -600,8 +580,6 @@ public class Config {
     ui.put("show-captured", true);
     ui.put("show-best-moves", true);
     ui.put("show-next-moves", true);
-    ui.put("show-subboard", true);
-    ui.put("large-subboard", false);
     ui.put("win-rate-always-black", false);
     ui.put("confirm-exit", false);
     ui.put("resume-previous-game", false);
@@ -619,7 +597,6 @@ public class Config {
     ui.put("show-katago-boardscoremean", false);
     ui.put("katago-scoremean-alwaysblack", false);
     ui.put("show-katago-estimate", false);
-    ui.put("show-katago-estimate-onsubboard", true);
     ui.put("show-katago-estimate-onmainboard", true);
     ui.put("katago-estimate-mode", "small");
     ui.put("katago-estimate-blend", true);

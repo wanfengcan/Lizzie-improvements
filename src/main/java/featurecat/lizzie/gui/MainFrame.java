@@ -172,10 +172,6 @@ public abstract class MainFrame extends JFrame {
     Input.undo();
   }
 
-  public boolean subBoardOnClick(MouseEvent e) {
-    return false;
-  }
-
   public void onCenterClicked(int x, int y) {}
 
   public void onMouseDragged(int x, int y) {}
@@ -432,8 +428,4 @@ public abstract class MainFrame extends JFrame {
   public abstract boolean openRightClickMenu(int x, int y);
 
   public abstract void clearBeforeMove();
-
-  public abstract void clearIsMouseOverSub();
-
-  public abstract boolean processSubBoardMouseWheelMoved(MouseWheelEvent e);
 }

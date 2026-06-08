@@ -354,17 +354,6 @@ public class Menu extends JMenuBar {
     final JMenu panelView = new JMenu(resourceBundle.getString("Menu.view.panelView"));
     viewMenu.add(panelView);
 
-    final JCheckBoxMenuItem subBoard =
-        new JCheckBoxMenuItem(resourceBundle.getString("Menu.view.panelView.subBoard"));
-    subBoard.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Lizzie.config.toggleShowSubBoard();
-          }
-        });
-    panelView.add(subBoard);
-
     final JCheckBoxMenuItem winrateGraph =
         new JCheckBoxMenuItem(resourceBundle.getString("Menu.view.panelView.winrateGraph"));
     winrateGraph.addActionListener(
@@ -444,18 +433,6 @@ public class Menu extends JMenuBar {
 
     viewMenu.addSeparator();
 
-    final JCheckBoxMenuItem bigSubBoard =
-        new JCheckBoxMenuItem(resourceBundle.getString("Menu.view.bigSubBoard"));
-    bigSubBoard.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Lizzie.config.toggleLargeSubBoard();
-            Lizzie.frame.refresh(2);
-          }
-        });
-    viewMenu.add(bigSubBoard);
-
     final JCheckBoxMenuItem bigWinGraph =
         new JCheckBoxMenuItem(resourceBundle.getString("Menu.view.bigWinGraph"));
     bigWinGraph.addActionListener(
@@ -518,9 +495,7 @@ public class Menu extends JMenuBar {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            if (!Lizzie.config.showSubBoard) Lizzie.config.toggleShowSubBoard();
             if (!Lizzie.config.showWinrate) Lizzie.config.toggleShowWinrate();
-            if (Lizzie.config.showLargeSubBoard()) Lizzie.config.toggleLargeSubBoard();
             if (Lizzie.config.showLargeWinrate()) Lizzie.config.toggleLargeWinrate();
             if (!Lizzie.config.showComment) Lizzie.config.toggleShowComment();
             if (!Lizzie.config.showCaptured) Lizzie.config.toggleShowCaptured();
@@ -542,10 +517,8 @@ public class Menu extends JMenuBar {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            if (!Lizzie.config.showSubBoard) Lizzie.config.toggleShowSubBoard();
             if (!Lizzie.config.showWinrate) Lizzie.config.toggleShowWinrate();
             if (Lizzie.config.showLargeWinrate()) Lizzie.config.toggleLargeWinrate();
-            if (!Lizzie.config.showLargeSubBoard()) Lizzie.config.toggleLargeSubBoard();
             if (!Lizzie.config.showComment) Lizzie.config.toggleShowComment();
             if (!Lizzie.config.showCaptured) Lizzie.config.toggleShowCaptured();
             if (Lizzie.config.showStatus) Lizzie.config.toggleShowStatus();
@@ -567,7 +540,6 @@ public class Menu extends JMenuBar {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            if (Lizzie.config.showSubBoard) Lizzie.config.toggleShowSubBoard();
             if (Lizzie.config.showComment) Lizzie.config.toggleShowComment();
             if (Lizzie.config.showCaptured) Lizzie.config.toggleShowCaptured();
             if (Lizzie.config.showStatus) Lizzie.config.toggleShowStatus();
@@ -721,12 +693,9 @@ public class Menu extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
             Lizzie.config.showKataGoEstimate = true;
             Lizzie.config.showKataGoEstimateOnMainboard = true;
-            Lizzie.config.showKataGoEstimateOnSubboard = false;
             Lizzie.frame.removeEstimateRect();
             Lizzie.leelaz.ponder();
             Lizzie.config.uiConfig.put("show-katago-estimate", Lizzie.config.showKataGoEstimate);
-            Lizzie.config.uiConfig.put(
-                "show-katago-estimate-onsubboard", Lizzie.config.showKataGoEstimateOnSubboard);
             Lizzie.config.uiConfig.put(
                 "show-katago-estimate-onmainboard", Lizzie.config.showKataGoEstimateOnMainboard);
             try {
@@ -743,12 +712,9 @@ public class Menu extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
             Lizzie.config.showKataGoEstimate = true;
             Lizzie.config.showKataGoEstimateOnMainboard = false;
-            Lizzie.config.showKataGoEstimateOnSubboard = true;
             Lizzie.frame.removeEstimateRect();
             Lizzie.leelaz.ponder();
             Lizzie.config.uiConfig.put("show-katago-estimate", Lizzie.config.showKataGoEstimate);
-            Lizzie.config.uiConfig.put(
-                "show-katago-estimate-onsubboard", Lizzie.config.showKataGoEstimateOnSubboard);
             Lizzie.config.uiConfig.put(
                 "show-katago-estimate-onmainboard", Lizzie.config.showKataGoEstimateOnMainboard);
             try {
@@ -765,12 +731,9 @@ public class Menu extends JMenuBar {
           public void actionPerformed(ActionEvent e) {
             Lizzie.config.showKataGoEstimate = true;
             Lizzie.config.showKataGoEstimateOnMainboard = true;
-            Lizzie.config.showKataGoEstimateOnSubboard = true;
             Lizzie.frame.removeEstimateRect();
             Lizzie.leelaz.ponder();
             Lizzie.config.uiConfig.put("show-katago-estimate", Lizzie.config.showKataGoEstimate);
-            Lizzie.config.uiConfig.put(
-                "show-katago-estimate-onsubboard", Lizzie.config.showKataGoEstimateOnSubboard);
             Lizzie.config.uiConfig.put(
                 "show-katago-estimate-onmainboard", Lizzie.config.showKataGoEstimateOnMainboard);
             try {
@@ -989,12 +952,10 @@ public class Menu extends JMenuBar {
             {
               boolean onMain =
                   Lizzie.config.showKataGoEstimate && Lizzie.config.showKataGoEstimateOnMainboard;
-              boolean onSub =
-                  Lizzie.config.showKataGoEstimate && Lizzie.config.showKataGoEstimateOnSubboard;
-              kataEstimateDisplayNone.setState(!onMain && !onSub);
-              kataEstimateDisplayMain.setState(onMain && !onSub);
-              kataEstimateDisplaySub.setState(!onMain && onSub);
-              kataEstimateDisplayBoth.setState(onMain && onSub);
+              kataEstimateDisplayNone.setState(!onMain);
+              kataEstimateDisplayMain.setState(onMain);
+              kataEstimateDisplaySub.setState(false);
+              kataEstimateDisplayBoth.setState(onMain);
             }
             kataEstimateModeLarge.setState(Lizzie.config.kataGoEstimateMode.equals("large"));
             kataEstimateModeSmall.setState(Lizzie.config.kataGoEstimateMode.equals("small"));
@@ -1017,11 +978,6 @@ public class Menu extends JMenuBar {
             if (Lizzie.config.showWinrate && Lizzie.config.showLargeWinrate())
               bigWinGraph.setState(true);
             else bigWinGraph.setState(false);
-            if (Lizzie.config.showSubBoard && Lizzie.config.showLargeSubBoard())
-              bigSubBoard.setState(true);
-            else bigSubBoard.setState(false);
-            if (Lizzie.config.showSubBoard) subBoard.setState(true);
-            else subBoard.setState(false);
             if (Lizzie.config.showWinrate) winrateGraph.setState(true);
             else winrateGraph.setState(false);
             if (Lizzie.config.showComment) comment.setState(true);

@@ -80,7 +80,6 @@ public class LizzieFrame extends MainFrame {
     // resourceBundle.getString("LizzieFrame.commands.keyE"),
   };
   private static BoardRenderer boardRenderer;
-  private static BoardRenderer subBoardRenderer;
   private static Menu menu;
   private JPanel mainPanel;
 
@@ -100,8 +99,7 @@ public class LizzieFrame extends MainFrame {
   public LizzieFrame() {
     super();
 
-    boardRenderer = new BoardRenderer(true);
-    subBoardRenderer = new BoardRenderer(false);
+    boardRenderer = new BoardRenderer();
     menu = new Menu();
     toolBar = new ToolBar();
     toolBar.setVisible(Lizzie.config.showToolBar);
@@ -264,17 +262,6 @@ public class LizzieFrame extends MainFrame {
     boardRenderer.setupSizeParameters();
     boardRenderer.draw(g);
 
-    if (Lizzie.leelaz != null && Lizzie.leelaz.isLoaded() && Lizzie.config.showSubBoard) {
-      try {
-        subBoardRenderer.setLocation(leftInset, topInset);
-        subBoardRenderer.setBoardLength(maxSize / 4, maxSize / 4);
-        subBoardRenderer.setupSizeParameters();
-        subBoardRenderer.draw(g);
-      } catch (Exception e) {
-        // This can happen when no space is left for subboard.
-      }
-    }
-
     g.dispose();
     g0.drawImage(cachedImage, 0, 0, null);
     g0.dispose();
@@ -284,7 +271,6 @@ public class LizzieFrame extends MainFrame {
 
   public void resetImages() {
     boardRenderer.resetImages();
-    subBoardRenderer.resetImages();
   }
 
   /**
@@ -319,20 +305,6 @@ public class LizzieFrame extends MainFrame {
   }
 
   public void onCenterClicked(int x, int y) {}
-
-  public boolean subBoardOnClick(MouseEvent e) {
-    int x = e.getX();
-    int y = e.getY();
-    if (Lizzie.config.showSubBoard && subBoardRenderer.isInside(x, y)) {
-      if (e.getButton() == MouseEvent.BUTTON1) subBoardRenderer.increaseBestmoveIndexSub(1);
-      if (e.getButton() == MouseEvent.BUTTON3) subBoardRenderer.increaseBestmoveIndexSub(-1);
-      if (e.getButton() == MouseEvent.BUTTON2) Lizzie.config.toggleLargeSubBoard();
-      subBoardRenderer.setClickedSub(true);
-      repaint();
-      return true;
-    }
-    return false;
-  }
 
   public void clearMoved() {
     isReplayVariation = false;
@@ -369,17 +341,6 @@ public class LizzieFrame extends MainFrame {
     if (!coords.isPresent() && boardRenderer.isShowingBranch()) {
       clearMoved();
       repaint();
-    }
-    if (Lizzie.config.showSubBoard && subBoardRenderer.isInside(x, y)) {
-      if (!subBoardRenderer.getIsMouseOverSub()) {
-        subBoardRenderer.setIsMouseOverSub(true);
-        repaint();
-      }
-    } else {
-      if (subBoardRenderer.getIsMouseOverSub()) {
-        Lizzie.frame.clearIsMouseOverSub();
-        repaint();
-      }
     }
   }
 
@@ -528,17 +489,5 @@ public class LizzieFrame extends MainFrame {
   private void showMenu(int x, int y) {}
 
   @Override
-  public void clearBeforeMove() {
-    subBoardRenderer.clearBeforeMove();
-  }
-
-  @Override
-  public void clearIsMouseOverSub() {
-    subBoardRenderer.setIsMouseOverSub(false);
-    Utils.setDisplayedBranchLength(subBoardRenderer, -2);
-  }
-
-  public boolean processSubBoardMouseWheelMoved(MouseWheelEvent e) {
-    return false;
-  }
+  public void clearBeforeMove() {}
 }

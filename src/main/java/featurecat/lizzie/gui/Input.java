@@ -19,7 +19,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
   @Override
   public void mousePressed(MouseEvent e) {
     Lizzie.frame.toolBar.setTxtUnfocus();
-    if (Lizzie.frame.subBoardOnClick(e)) return;
     if (e.isAltDown() && e.getButton() == MouseEvent.BUTTON1) {
       startSettingRegionOfInterest(e);
       Lizzie.frame.refresh();
@@ -177,8 +176,7 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
 
   private void toggleHints() {
     Lizzie.config.toggleShowBranch();
-    Lizzie.config.showSubBoard =
-        Lizzie.config.showNextMoves = Lizzie.config.showBestMoves = Lizzie.config.showBranch;
+    Lizzie.config.showNextMoves = Lizzie.config.showBestMoves = Lizzie.config.showBranch;
   }
 
   private void nextBranch() {
@@ -452,8 +450,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
       case VK_Z:
         if (e.isShiftDown()) {
           toggleHints();
-        } else if (e.isAltDown()) {
-          Lizzie.config.toggleShowSubBoard();
         } else {
           startTemporaryBoard();
         }
@@ -579,9 +575,6 @@ public class Input implements MouseListener, KeyListener, MouseWheelListener, Mo
   @Override
   public void mouseWheelMoved(MouseWheelEvent e) {
     if (Lizzie.frame.processCommentMouseWheelMoved(e)) {
-      return;
-    }
-    if (Lizzie.frame.processSubBoardMouseWheelMoved(e)) {
       return;
     }
     if (e.getWhen() - wheelWhen > 0) {

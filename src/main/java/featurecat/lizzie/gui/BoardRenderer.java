@@ -98,13 +98,9 @@ public class BoardRenderer {
   private int displayedBranchLength = SHOW_NORMAL_BOARD;
   private int cachedDisplayedBranchLength = SHOW_RAW_BOARD;
   private boolean showingBranch = false;
-  private boolean isMainBoard = false;
 
   private int maxAlpha = 240;
 
-  private boolean isMouseOverSub = false;
-  private boolean clickedSub = false;
-  private int bestmoveIndexSub = 0;
   private List<String> variation;
   private String mouseOverCoords = "";
 
@@ -122,14 +118,13 @@ public class BoardRenderer {
     float percentPlayouts;
   }
 
-  public BoardRenderer(boolean isMainBoard) {
+  public BoardRenderer() {
     uiConfig = Lizzie.config.uiConfig;
     uiPersist = Lizzie.config.persisted.getJSONObject("ui-persist");
     try {
       maxAlpha = uiPersist.getInt("max-alpha");
     } catch (JSONException e) {
     }
-    this.isMainBoard = isMainBoard;
   }
 
   /** Draw a go board */
@@ -141,12 +136,11 @@ public class BoardRenderer {
     drawGoban(g);
     if (Lizzie.board != null && Lizzie.board.regionOfInterest.isEnabledOrInSetting())
       drawRegionOfInterest(g);
-    if (!isMainBoard) drawSubBoardStatus(g);
-    if (Lizzie.config.showNameInBoard && isMainBoard) drawName(g);
+    if (Lizzie.config.showNameInBoard) drawName(g);
     //        timer.lap("background");
     drawStones();
     //        timer.lap("stones");
-    if (Lizzie.board != null && Lizzie.board.inScoreMode() && isMainBoard) {
+    if (Lizzie.board != null && Lizzie.board.inScoreMode()) {
       drawScore(g);
     } else {
       drawBranch();
@@ -155,13 +149,6 @@ public class BoardRenderer {
 
     renderImages(g);
     //        timer.lap("rendering images");
-
-    if (!isMainBoard) {
-      if (showingBranch) {
-        drawMoveNumbers(g);
-      }
-      return;
-    }
 
     if (!isShowingRawBoard()) {
       drawMoveNumbers(g);
@@ -259,7 +246,7 @@ public class BoardRenderer {
         || cachedX != x
         || cachedY != y
         || cachedBackgroundImageHasCoordinatesEnabled != showCoordinates()
-        || (changedName && isMainBoard)
+        || (changedName)
         || Lizzie.frame.isForceRefresh()) {
       changedName = false;
       cachedBoardWidth = boardWidth;
@@ -350,42 +337,6 @@ public class BoardRenderer {
     g0.drawImage(cachedBackgroundImage, 0, 0, null);
     cachedX = x;
     cachedY = y;
-  }
-
-  private void drawSubBoardStatus(Graphics2D g) {
-    // TODO Auto-generated method stub
-    g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-    g.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON);
-    g.setColor(Color.BLACK);
-    if (isMouseOverSub) {
-      g.fillRect(
-          x + boardWidth - stoneRadius * 7 / 2,
-          y + boardHeight - scaledMarginHeight * 9 / 10,
-          scaledMarginHeight * 3 / 10,
-          scaledMarginHeight * 8 / 10);
-      g.fillRect(
-          x + boardWidth + scaledMarginHeight * 5 / 10 - stoneRadius * 7 / 2,
-          y + boardHeight - scaledMarginHeight * 9 / 10,
-          scaledMarginHeight * 3 / 10,
-          scaledMarginHeight * 8 / 10);
-    } else {
-      int[] xPoints = {
-        x + boardWidth - stoneRadius * 7 / 2,
-        x + boardWidth - stoneRadius * 7 / 2,
-        x + boardWidth - stoneRadius * 5 / 2
-      };
-      int[] yPoints = {
-        y + boardHeight - 1,
-        y + boardHeight - scaledMarginHeight + 1,
-        y + boardHeight - scaledMarginHeight / 2
-      };
-      g.fillPolygon(xPoints, yPoints, 3);
-    }
-    g.setFont(new Font(Lizzie.config.uiFontName, Font.BOLD, stoneRadius * 3 / 2));
-    g.drawString(
-        "" + (this.bestmoveIndexSub + 1),
-        x + boardWidth - stoneRadius * 9 / 5,
-        y + boardHeight - stoneRadius / 10);
   }
 
   private void drawName(Graphics2D g0) {
@@ -632,7 +583,7 @@ public class BoardRenderer {
 
     variationOpt = Optional.empty();
 
-    if (isMainBoard && (isShowingRawBoard() || !Lizzie.config.showBranchNow())) {
+    if (isShowingRawBoard() || !Lizzie.config.showBranchNow()) {
       return;
     }
 
@@ -641,27 +592,16 @@ public class BoardRenderer {
     Graphics2D gShadow = (Graphics2D) branchStonesShadowImage.getGraphics();
     gShadow.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 
-    Optional<MoveData> suggestedMove = (isMainBoard ? mouseOveredMove() : getBestMove());
+    Optional<MoveData> suggestedMove = mouseOveredMove();
     if (!suggestedMove.isPresent()
-        || (!isMainBoard && Lizzie.frame.isAutoEstimating)
-        || (isMainBoard && Lizzie.frame.isShowingPolicy)) {
+        || Lizzie.frame.isShowingPolicy) {
       return;
     }
-    if (isMainBoard) {
-      if (!Lizzie.config.notRefreshVariation
-          || (!isShowingBranch || !mouseOverCoords.equals(suggestedMove.get().coordinate)))
-        variation = suggestedMove.get().variation;
-    } else {
-      if (!isMouseOverSub || clickedSub) {
-        if (clickedSub) {
-          clickedSub = false;
-          setDisplayedBranchLength(SHOW_NORMAL_BOARD);
-        }
-        variation = suggestedMove.get().variation;
-      }
-    }
+    if (!Lizzie.config.notRefreshVariation
+        || (!isShowingBranch || !mouseOverCoords.equals(suggestedMove.get().coordinate)))
+      variation = suggestedMove.get().variation;
     Branch branch = new Branch(Lizzie.board, variation, -1);
-    if (isMainBoard) mouseOverCoords = suggestedMove.get().coordinate;
+    mouseOverCoords = suggestedMove.get().coordinate;
     branchOpt = Optional.of(branch);
     variationOpt = Optional.of(variation);
     showingBranch = true;
@@ -699,17 +639,9 @@ public class BoardRenderer {
         .findFirst();
   }
 
-  private Optional<MoveData> getBestMove() {
-    if (!bestMoves.isEmpty()) {
-      if (bestMoves.size() < this.bestmoveIndexSub + 1) bestmoveIndexSub = bestMoves.size() - 1;
-      return Optional.of(bestMoves.get(bestmoveIndexSub));
-    }
-    return Optional.empty();
-  }
-
   /** Render the shadows and stones in correct background-foreground order */
   private void renderImages(Graphics2D g) {
-    boolean showBranchNow = Lizzie.config.showBranchNow() || !isMainBoard;
+    boolean showBranchNow = true;
     g.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_OFF);
     g.drawImage(cachedEstimateLargeRectImage, x, y, null);
     g.drawImage(cachedStonesShadowImage, x, y, null);
@@ -800,7 +732,7 @@ public class BoardRenderer {
 
         // don't write the move number if either: the move number is 0, or there will already be
         // playout information written
-        boolean isMouseOver = isMainBoard && Lizzie.frame.isMouseOver(i, j);
+        boolean isMouseOver = Lizzie.frame.isMouseOver(i, j);
         if (moveNumberList[Board.getIndex(i, j)] > 0 && (!branchOpt.isPresent() || !isMouseOver)) {
           boolean reverse = (moveNumberList[Board.getIndex(i, j)] > maxBranchMoves());
           if (reverse && !Lizzie.config.showRawBoard) continue;
@@ -1619,7 +1551,7 @@ public class BoardRenderer {
   }
 
   private int[] calculatePixelMargins() {
-    return calculatePixelMargins(boardWidth, boardHeight, showCoordinates(), isMainBoard);
+    return calculatePixelMargins(boardWidth, boardHeight, showCoordinates(), true);
   }
 
   /**
@@ -1838,7 +1770,7 @@ public class BoardRenderer {
   }
 
   private boolean showCoordinates() {
-    return isMainBoard && Lizzie.config.showCoordinates;
+    return Lizzie.config.showCoordinates;
   }
 
   public void increaseMaxAlpha(int k) {
@@ -2057,28 +1989,5 @@ public class BoardRenderer {
         }
       }
     }
-  }
-
-  public boolean getIsMouseOverSub() {
-    return isMouseOverSub;
-  }
-
-  public void setIsMouseOverSub(boolean status) {
-    isMouseOverSub = status;
-  }
-
-  public void setClickedSub(boolean status) {
-    clickedSub = status;
-  }
-
-  public void increaseBestmoveIndexSub(int n) {
-    if (bestmoveIndexSub + n >= 0) bestmoveIndexSub = bestmoveIndexSub + n;
-    getBestMove(); // call this here to correct exceeding bestmoveIndexSub
-  }
-
-  public void clearBeforeMove() {
-    setDisplayedBranchLength(SHOW_NORMAL_BOARD);
-    clickedSub = false;
-    bestmoveIndexSub = 0;
   }
 }
